@@ -10,7 +10,7 @@ sudo usermod -a -G dialout <username>
 Install the required dependencies.
 ```
 sudo apt install picocom
-pip install -r requirements.txt
+pip install -r dev-requirements.txt
 ```
 
 ## Flash the ESP32
