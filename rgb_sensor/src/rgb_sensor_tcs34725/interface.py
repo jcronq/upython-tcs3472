@@ -283,7 +283,7 @@ class Interface:
         enable_reg_value = self.read8(self.ADDR_ENABLE_REG)
         self.write8(self.ADDR_ENABLE_REG, enable_reg_value & ~self.ENABLE_RGBC_BIT)
 
-    def enable_wait_between_integrations(self):
+    def disable_wait_between_integrations(self):
         enable_reg_value = self.read8(self.ADDR_ENABLE_REG)
         self.write8(self.ADDR_ENABLE_REG, enable_reg_value & ~self.ENABLE_WAIT_BETWEEN_INTEGRATIONS)
 

@@ -1,4 +1,11 @@
 # TCS34725 - Color Temperature Sensor
+The TCS34725 is an RGB sensor.  I've connected it to an ESP32 and perform some mild processing to extract color temperature data as well.
+
+The interface file in rgb_sensor/src/rgb_sensor_tcs34725 is a complete implementation of the chips capabilities.
+
+The controller has implemented an auto-focus for the chips exposure and gain settings.
+
+These are likely the most useful parts of the project for anyone that has stumbled their way here.
 
 ## SETUP
 
@@ -20,18 +27,14 @@ make flash
 ```
 
 ## Connecting to Serial Port
-Install picocom to communicate over UART channel.
-```bash
-sudo apt install picocom
-```
-
-Then you can connect with the following
-```bash
-picocom /dev/ttyUSB0 -b115200
-```
-or
+Connect using rbash:
 ```bash
 make connect
+```
+
+Or connect directly to the REPL:
+```bash
+make connect-repl
 ```
 
 To end the picocom session: hold [ctrl] and press [a] then [q] without releasing [ctrl].
@@ -41,7 +44,3 @@ To end the picocom session: hold [ctrl] and press [a] then [q] without releasing
 ```bash
 make install
 ```
-
-
-TODO: 
-* Callibrate CT sensor to CT values produced by HUE White-Ambiance/Color bulbs
