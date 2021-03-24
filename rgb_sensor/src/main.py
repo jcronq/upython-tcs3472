@@ -24,7 +24,10 @@ def connect(cb):
     cb()
 
 def main():    
-    # print("hello world")
-    sensor = Controller(Controller.INTEGRATIONTIME_154MS, Controller.GAIN_1X)
+    print("hello world")
+    # sensor = Controller()
+    # print('rgbc=', sensor.color_raw)
+    # print('ct=',   sensor.ct)
+    # print('lux=',  sensor.lux)
     # cb = lambda: startWebServer(sensor)
     # connect(cb)
