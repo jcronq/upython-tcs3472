@@ -61,16 +61,14 @@ COMMAND_CLEAR_INTERRUPT = const(0x06)
 class Driver:
     i2c_freq = 9600
 
-    LED_PIN = 13
-    INTERRUPT_PIN = 23
 
-    def __init__(self, i2c):
+    def __init__(self, i2c, led_pin, interrupt_pin):
         self.interrupt_saturation_tolerance = 0.0
         self._BUFFER = bytearray(3)
 
         # Initialize pins
-        self._led_pin = Pin(self.LED_PIN, Pin.OUT)
-        self._interrupt_pin = Pin(self.INTERRUPT_PIN, Pin.IN, Pin.PULL_UP)
+        self._led_pin = Pin(led_pin, Pin.OUT)
+        self._interrupt_pin = Pin(interrupt_pin, Pin.IN, Pin.PULL_UP)
         self._interrupt_pin.irq(trigger=Pin.IRQ_FALLING, handler=self.get_clear_interrupt_handler())
         self._interrupt_callbacks = []
 
@@ -228,21 +226,7 @@ class Driver:
         # Set the correct interrupt thresholds according to saturation levels
         print("ATIME set", atime)
         self.write8(ADDR_RGBC_INTEGRATION_TIME, atime)
-        atime = self.ATIME
-        print("ATIME actual", atime)
 
-        saturation_tolerance = self.interrupt_saturation_tolerance * 65535
-        low_threshold = 100 #Recommended value from DN40 3.14
-
-        # DN40 3.5 & 3.7
-        if (256 - atime) < 63:
-            upper_saturation = (1024 * (256 - atime) * 0.75)
-        else:
-            upper_saturation = 65535
-        
-        upper_saturation = upper_saturation - saturation_tolerance
-        high_threshold = min(65535, max(0, int(upper_saturation)))
-        self.interrupt_thresholds = (low_threshold, high_threshold)
 
     @property
     def integration_count(self):

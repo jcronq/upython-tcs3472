@@ -4,12 +4,32 @@ Created on Fri Oct 25 16:00:35 2019
 
 @author: jcron
 """
+import machine
 from src.rgb_sensor_tcs34725 import Controller
 from src.web_server import WebServer
+from micropython import const
 
-def startWebServer(sensor):
-    server = webServer(sensor)
-    server.start()
+LED_PIN = const(13)
+INTERRUPT_PIN = const(23)
+SCL_PIN = const(22)
+SDA_PIN = const(21)
+
+def start_webserver(sensor):
+    server = WebServer(enable_web_dav=True)
+
+    @server.POST("/reset")
+    def reset_esp32(connection):
+        connection.send("HTTP/1.1 200 RESETING\n")
+        connection.close()
+        machine.reset()
+    
+    @server.GET("/rgbcct")
+    def get_rgbcct():
+        rgb = sensor.color_raw
+        print(rgb)
+        return rgb
+
+    server.start_listening()
 
 def connect(cb):
     import network
@@ -25,9 +45,9 @@ def connect(cb):
 
 def main():    
     print("hello world")
-    # sensor = Controller()
+    sensor = Controller(SCL_PIN, SDA_PIN, 9600, LED_PIN, INTERRUPT_PIN)
     # print('rgbc=', sensor.color_raw)
     # print('ct=',   sensor.ct)
     # print('lux=',  sensor.lux)
-    # cb = lambda: startWebServer(sensor)
-    # connect(cb)
+    cb = lambda: start_webserver(sensor)
+    connect(cb)
