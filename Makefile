@@ -8,5 +8,5 @@ connect-repl:
 connect:
 	rshell -p /dev/ttyUSB0
 
-install:
+install: flash
 	rshell -p /dev/ttyUSB0 -f scripts/install.rsh

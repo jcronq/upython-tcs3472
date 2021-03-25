@@ -214,7 +214,7 @@ class Driver:
     @gain.setter
     def gain(self, gain):
         """Sensor gain: 1, 4, 16, 60 """
-        print("gain set", GAINS.index(gain))
+        print("gain set", GAINS.index(gain), "(x{})".format(gain))
         self.write8(ADDR_CONTROL_REG, GAINS.index(gain))
 
     @property
@@ -224,7 +224,7 @@ class Driver:
     @ATIME.setter
     def ATIME(self, atime):
         # Set the correct interrupt thresholds according to saturation levels
-        print("ATIME set", atime)
+        print("ATIME set", atime, "({}ms)".format((256-atime)*TIME_ONE_CYCLE))
         self.write8(ADDR_RGBC_INTEGRATION_TIME, atime)
 
 

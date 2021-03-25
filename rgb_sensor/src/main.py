@@ -6,7 +6,7 @@ Created on Fri Oct 25 16:00:35 2019
 """
 import machine
 from src.rgb_sensor_tcs34725 import Controller
-from src.web_server import WebServer
+from src.lite_server.web_server import WebServer
 from micropython import const
 
 LED_PIN = const(13)
@@ -18,9 +18,9 @@ def start_webserver(sensor):
     server = WebServer(enable_web_dav=True)
 
     @server.POST("/reset")
-    def reset_esp32(connection):
-        connection.send("HTTP/1.1 200 RESETING\n")
-        connection.close()
+    def reset_esp32(response):
+        response.set_status(200)
+        response.send()
         machine.reset()
     
     @server.GET("/rgbcct")
@@ -43,11 +43,8 @@ def connect(cb):
     print('network config:', sta_if.ifconfig())
     cb()
 
-def main():    
+def run():
     print("hello world")
     sensor = Controller(SCL_PIN, SDA_PIN, 9600, LED_PIN, INTERRUPT_PIN)
-    # print('rgbc=', sensor.color_raw)
-    # print('ct=',   sensor.ct)
-    # print('lux=',  sensor.lux)
     cb = lambda: start_webserver(sensor)
     connect(cb)
