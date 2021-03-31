@@ -13,26 +13,19 @@ from src.lite_server.request import Request
 import src.lite_server.dav_functions as web_dav
 
 
-def identify_additional_args(method, uri, func, optional_args):
-    methods = dir(func)
-    additional_args = []
-    for arg in optional_args:
-        if arg in methods:
-            additional_args.append(arg)
-    
-    return additional_args
+def function_args(func):
+    function_arguments = [i for i in dir(func) if not i.startswith('__')]
+    return function_arguments
 
-def add_additional_args(additional_args, *, optional_args, kwargs):
-    for arg in additional_args:
-        kwargs[arg] = optional_args[arg]
+def get_function_kwargs(arg_list, request, response):
+    """ Throws KeyError if arg is not available in body """
+    kwarg_source = request.body if isinstance(request.body, dict) else {}
+    kwarg_source.update({'request': request, 'response': response})
+    kwargs = {
+        arg_name: kwarg_source[arg_name]
+        for arg_name in arg_list
+    }
     return kwargs
-
-def get_inner_func(method, uri, func):
-    additional_args = identify_additional_args(method, uri, func, ['request', 'response'])
-    def inner_call(*args, request, response, **kwargs):
-        kwargs = add_additional_args(additional_args, optional_args={'response': response, 'request': request}, kwargs=kwargs)
-        return func(*args, **kwargs)
-    return inner_call
 
 class WebServer:
     _run = True
@@ -54,16 +47,14 @@ class WebServer:
     
     def POST(self, uri):
         def wrapper(func):
-            inner_call = get_inner_func('POST', uri, func)
-            self.__router["POST"][uri] = inner_call
-            return inner_call
+            self.__router["POST"][uri] = (func, function_args(func))
+            return func
         return wrapper
 
     def GET(self, uri):
         def wrapper(func):
-            inner_call = get_inner_func('GET', uri, func)
-            self.__router["GET"][uri] = inner_call
-            return inner_call
+            self.__router["GET"][uri] = (func, function_args(func))
+            return func
         return wrapper
 
     def __run(self):
@@ -97,10 +88,11 @@ class WebServer:
 
                     elif uri in self.__router[method]:
                         print("request received:", request)
-                        callback = self.__router[method][uri]
+                        callback, arg_list = self.__router[method][uri]
                         response = Response(conn)
                         print("calling bound method")
-                        result = callback(request=request, response=response)
+                        kwargs = get_function_kwargs(arg_list, request, response):
+                        result = callback(**kwargs)
                         print("complete")
 
                         if not response.body_set:

@@ -26,8 +26,14 @@ def start_webserver(sensor):
     @server.GET("/rgbcct")
     def get_rgbcct():
         rgb = sensor.color_raw
-        print(rgb)
-        return rgb
+        ct = sensor.ct
+        lux = sensor.lux
+        return [rgb[0], rgb[1], rgb[2], rgb[3], ct, lux]
+
+    @server.GET("/status")
+    def get_status():
+        status = sensor.status
+        return status
 
     server.start_listening()
 
@@ -46,5 +52,6 @@ def connect(cb):
 def run():
     print("hello world")
     sensor = Controller(SCL_PIN, SDA_PIN, 9600, LED_PIN, INTERRUPT_PIN)
+    print("sensor initialized")
     cb = lambda: start_webserver(sensor)
     connect(cb)

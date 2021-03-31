@@ -234,11 +234,14 @@ class Driver:
     
     @integration_count.setter
     def integration_count(self, integration_count):
-        self.ATIME = 256 - integration_count
+        self.ATIME = 255 - integration_count
 
     @property
     def integration_time(self):
-        return self.integration_count * TIME_ONE_CYCLE
+        print("integration time")
+        atime = self.read8(ADDR_RGBC_INTEGRATION_TIME)
+        print("integration time", atime)
+        return (255 - atime) * TIME_ONE_CYCLE
 
     @integration_time.setter
     def integration_time(self, integration_time_ms):
@@ -268,7 +271,9 @@ class Driver:
     def enable_rgbc(self):
         print("enable_rgbc")
         enable_reg_value = self.read8(ADDR_ENABLE_REG)
+        print('enable_reg_value', enable_reg_value)
         self.write8(ADDR_ENABLE_REG, enable_reg_value | ENABLE_RGBC_BIT)
+        print('complete')
 
     def enable_wait_between_integrations(self):
         print("enable wait")

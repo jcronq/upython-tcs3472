@@ -1,8 +1,7 @@
 #!/bin/bash
 #--data-binary $file_reference \
 host="$1"
-name="status"
+name="reboot"
 curl \
-    --request GET \
+    --request POST \
     http://$host:8008/$name
-echo ""

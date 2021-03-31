@@ -43,20 +43,23 @@ class Controller:
 
         self._sensor_driver.enable_rgbc()
         # sleep for 1 integration cycle
-        time.sleep((self._sensor_driver.integration_time + self._sensor_driver.wait_time) / 1000)
+        sleep_time = (self._sensor_driver.integration_time + self._sensor_driver.wait_time) / 1000
+        print("sleep for {}".format(sleep_time))
+        time.sleep(sleep_time)
 
     def get_interrupt_handler(self):
         def interrupt_handler():
+            print("controller interrupt called")
             self.calibrate()
         
         return interrupt_handler
 
     
     def calibrate(self):
+        print("calibrate")
         if self._sensor_driver.is_interrupt_enabled:
             self._sensor_driver.disable_interrupt()
             self._sensor_driver.clear_interrupt()
-
         r, g, b, c = self._sensor_driver.color_raw
         current_gain = self._sensor_driver.gain
         current_integration_time = self._sensor_driver.integration_time
@@ -132,3 +135,12 @@ class Controller:
     @property
     def driver(self):
         return self._sensor_driver
+
+    @property
+    def status(self):
+        return {
+            'gain': self._sensor_driver.gain,
+            'integration_time': self._sensor_driver.integration_time,
+            'wait_time': self._sensor_driver.wait_time,
+            'wait_enabled': self._sensor_driver.is_wait_between_integration_enabled
+        }
